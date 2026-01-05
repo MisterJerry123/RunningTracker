@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.misterjerry.runningtracker.MainViewModel
-import com.misterjerry.runningtracker.data.Run
+import com.misterjerry.runningtracker.domain.model.Run
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date

@@ -8,26 +8,32 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.misterjerry.runningtracker.data.Run
 import com.misterjerry.runningtracker.data.RunDatabase
+import com.misterjerry.runningtracker.data.repository.RunRepositoryImpl
+import com.misterjerry.runningtracker.domain.model.Run
+import com.misterjerry.runningtracker.domain.usecase.DeleteRunUseCase
+import com.misterjerry.runningtracker.domain.usecase.GetRunByIdUseCase
+import com.misterjerry.runningtracker.domain.usecase.GetRunsUseCase
+import com.misterjerry.runningtracker.domain.usecase.SaveRunUseCase
 import com.misterjerry.runningtracker.service.TrackingService
 import com.misterjerry.runningtracker.util.Constants.ACTION_PAUSE_SERVICE
 import com.misterjerry.runningtracker.util.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.misterjerry.runningtracker.util.Constants.ACTION_STOP_SERVICE
 import org.osmdroid.util.GeoPoint
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel(
+    application: Application,
+    private val getRunsUseCase: GetRunsUseCase,
+    private val saveRunUseCase: SaveRunUseCase,
+    private val deleteRunUseCase: DeleteRunUseCase,
+    private val getRunByIdUseCase: GetRunByIdUseCase
+) : AndroidViewModel(application) {
 
-    private val runDao = RunDatabase.getDatabase(application).getRunDao()
-
-    val runs = runDao.getAllRunsSortedByDate()
+    val runs = getRunsUseCase()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     val isTracking = TrackingService.isTracking
@@ -66,17 +72,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
         
         viewModelScope.launch {
-            runDao.insertRun(run)
+            saveRunUseCase(run)
         }
     }
     
     suspend fun getRunById(id: Int): Run? {
-        return runDao.getRunById(id)
+        return getRunByIdUseCase(id)
     }
 
     fun deleteRun(run: Run) {
         viewModelScope.launch {
-            runDao.deleteRun(run)
+            deleteRunUseCase(run)
         }
     }
 
@@ -107,8 +113,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            val db = RunDatabase.getDatabase(application)
+            val repository = RunRepositoryImpl(db.getRunDao())
+            val getRunsUseCase = GetRunsUseCase(repository)
+            val saveRunUseCase = SaveRunUseCase(repository)
+            val deleteRunUseCase = DeleteRunUseCase(repository)
+            val getRunByIdUseCase = GetRunByIdUseCase(repository)
+            
             @Suppress("UNCHECKED_CAST")
-            return MainViewModel(application) as T
+            return MainViewModel(
+                application,
+                getRunsUseCase,
+                saveRunUseCase,
+                deleteRunUseCase,
+                getRunByIdUseCase
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

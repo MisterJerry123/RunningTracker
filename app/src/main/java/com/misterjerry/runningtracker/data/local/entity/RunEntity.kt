@@ -1,11 +1,11 @@
-package com.misterjerry.runningtracker.data
+package com.misterjerry.runningtracker.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.osmdroid.util.GeoPoint
 
 @Entity(tableName = "running_table")
-data class Run(
+data class RunEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     var img: ByteArray? = null,

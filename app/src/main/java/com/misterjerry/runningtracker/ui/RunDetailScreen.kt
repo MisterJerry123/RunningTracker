@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.misterjerry.runningtracker.MainViewModel
-import com.misterjerry.runningtracker.data.Run
+import com.misterjerry.runningtracker.domain.model.Run
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
