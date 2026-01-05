@@ -1,10 +1,11 @@
-package com.misterjerry.runningtracker.data
+package com.misterjerry.runningtracker.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.osmdroid.util.GeoPoint
 
 @Entity(tableName = "running_table")
-data class Run(
+data class RunEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     var img: ByteArray? = null,
@@ -13,5 +14,5 @@ data class Run(
     var distanceInMeters: Int = 0,
     var timeInMillis: Long = 0L,
     var caloriesBurned: Int = 0,
-    var pathPoints: String = "" // Consider storing as a JSON string or simplified format for now
+    var pathPoints: List<List<GeoPoint>> = emptyList()
 )
