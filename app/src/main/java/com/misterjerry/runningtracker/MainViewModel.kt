@@ -61,11 +61,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             avgSpeedInKMH = avgSpeed,
             distanceInMeters = totalDistance,
             timeInMillis = curTimeInMillis,
-            caloriesBurned = 0 // Calculator needed
+            caloriesBurned = 0, // Calculator needed
+            pathPoints = pathPoints.value
         )
         
         viewModelScope.launch {
             runDao.insertRun(run)
+        }
+    }
+    
+    suspend fun getRunById(id: Int): Run? {
+        return runDao.getRunById(id)
+    }
+
+    fun deleteRun(run: Run) {
+        viewModelScope.launch {
+            runDao.deleteRun(run)
         }
     }
 

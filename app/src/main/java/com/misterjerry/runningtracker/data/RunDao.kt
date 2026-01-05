@@ -30,6 +30,9 @@ interface RunDao {
 
     @Query("SELECT * FROM running_table ORDER BY distanceInMeters DESC")
     fun getAllRunsSortedByDistance(): Flow<List<Run>>
+    
+    @Query("SELECT * FROM running_table WHERE id = :id")
+    suspend fun getRunById(id: Int): Run?
 
     @Query("SELECT SUM(timeInMillis) FROM running_table")
     fun getTotalTimeInMillis(): Flow<Long>

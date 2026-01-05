@@ -36,6 +36,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 @Composable
 fun RunScreen(
@@ -47,8 +49,9 @@ fun RunScreen(
     val timeInMillis by viewModel.timeRunInMillis.collectAsState()
     val context = LocalContext.current
     
-    // Initialize osmdroid configuration
+    // Initialize osmdroid configuration with explicit user agent
     Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
+    Configuration.getInstance().userAgentValue = context.packageName
 
     val mapView = remember {
         MapView(context).apply {
@@ -74,6 +77,17 @@ fun RunScreen(
         }
     }
 
+    val locationOverlay = remember {
+        MyLocationNewOverlay(GpsMyLocationProvider(context), mapView).apply {
+            enableMyLocation()
+            enableFollowLocation()
+        }
+    }
+    
+    LaunchedEffect(Unit) {
+        mapView.overlays.add(locationOverlay)
+    }
+
     LaunchedEffect(pathPoints) {
         if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
             val lastPoint = pathPoints.last().last()
@@ -82,6 +96,8 @@ fun RunScreen(
         
         // Update polylines
         mapView.overlays.clear()
+        
+        // 1. Add Polylines first (bottom layer)
         pathPoints.forEach { pointList ->
             if (pointList.size > 1) {
                 val polyline = Polyline().apply {
@@ -92,6 +108,10 @@ fun RunScreen(
                 mapView.overlays.add(polyline)
             }
         }
+        
+        // 2. Add Location Overlay last (top layer)
+        mapView.overlays.add(locationOverlay)
+        
         mapView.invalidate()
     }
 

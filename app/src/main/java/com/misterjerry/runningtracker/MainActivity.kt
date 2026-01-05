@@ -6,16 +6,22 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.misterjerry.runningtracker.ui.HomeScreen
+import com.misterjerry.runningtracker.ui.RunDetailScreen
 import com.misterjerry.runningtracker.ui.RunScreen
 import com.misterjerry.runningtracker.ui.theme.RunningTrackerTheme
 import com.misterjerry.runningtracker.util.Constants.ACTION_SHOW_TRACKING_FRAGMENT
@@ -29,24 +35,35 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         requestPermissions()
         navigateToTrackingFragmentIfNeeded(intent)
 
         setContent {
             RunningTrackerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "home_screen") {
-                        composable("home_screen") {
-                            HomeScreen(navController = navController, viewModel = viewModel)
-                        }
-                        composable("run_screen") {
-                            RunScreen(navController = navController, viewModel = viewModel)
-                        }
-                    }
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        val navController = rememberNavController()
+                        NavHost(navController = navController, startDestination = "home_screen") {
+                            composable("home_screen") {
+                                HomeScreen(navController = navController, viewModel = viewModel)
+                            }
+                                                    composable("run_screen") {
+                                                        RunScreen(navController = navController, viewModel = viewModel)
+                                                    }
+                                                    composable(
+                                                        route = "run_detail_screen/{runId}",
+                                                        arguments = listOf(navArgument("runId") { type = NavType.IntType })
+                                                    ) { backStackEntry ->
+                                                        val runId = backStackEntry.arguments?.getInt("runId") ?: 0
+                                                        RunDetailScreen(navController = navController, viewModel = viewModel, runId = runId)
+                                                    }
+                                                }                    }
                 }
             }
         }

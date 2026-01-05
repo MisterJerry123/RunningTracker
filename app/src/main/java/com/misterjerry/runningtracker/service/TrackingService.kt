@@ -86,7 +86,10 @@ class TrackingService : Service() {
                         startForegroundService()
                         isFirstRun = false
                     } else {
-                        startTimer()
+                        // Prevent starting multiple timers if already tracking
+                        if (!isTracking.value) {
+                            startTimer()
+                        }
                     }
                 }
                 ACTION_PAUSE_SERVICE -> {
@@ -178,14 +181,18 @@ class TrackingService : Service() {
             val pos = GeoPoint(it.latitude, it.longitude)
             pathPoints.value.apply {
                 last().add(pos)
-                pathPoints.value = this
+                val newPathPoints = mutableListOf<Polyline>()
+                newPathPoints.addAll(this)
+                pathPoints.value = newPathPoints
             }
         }
     }
 
     private fun addEmptyPolyline() = pathPoints.value?.apply {
         add(mutableListOf())
-        pathPoints.value = this
+        val newPathPoints = mutableListOf<Polyline>()
+        newPathPoints.addAll(this)
+        pathPoints.value = newPathPoints
     } ?: pathPoints.value.let {
         pathPoints.value = mutableListOf(mutableListOf())
     }
