@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // Maps & Location
-    implementation(libs.google.maps.compose)
+    implementation(libs.osmdroid.android)
     implementation(libs.play.services.location)
 
     // Room
