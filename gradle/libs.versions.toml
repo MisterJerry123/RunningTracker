@@ -14,8 +14,10 @@ playServicesLocation = "21.3.0"
 navigationCompose = "2.8.5"
 ksp = "2.0.21-1.0.27"
 gson = "2.10.1"
+coroutines = "1.9.0"
 
 [libraries]
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

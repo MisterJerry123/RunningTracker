@@ -47,6 +47,7 @@ fun RunScreen(
     val isTracking by viewModel.isTracking.collectAsState()
     val pathPoints by viewModel.pathPoints.collectAsState()
     val timeInMillis by viewModel.timeRunInMillis.collectAsState()
+    val initialLocation by viewModel.initialLocation.collectAsState()
     val context = LocalContext.current
     
     // Initialize osmdroid configuration with explicit user agent
@@ -58,6 +59,14 @@ fun RunScreen(
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
             controller.setZoom(17.0)
+        }
+    }
+    
+    LaunchedEffect(initialLocation) {
+        initialLocation?.let {
+            if (pathPoints.isEmpty() || pathPoints.first().isEmpty()) {
+                 mapView.controller.setCenter(it)
+            }
         }
     }
     
@@ -91,7 +100,7 @@ fun RunScreen(
     LaunchedEffect(pathPoints) {
         if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
             val lastPoint = pathPoints.last().last()
-            mapView.controller.animateTo(GeoPoint(lastPoint.latitude, lastPoint.longitude))
+            mapView.controller.setCenter(GeoPoint(lastPoint.latitude, lastPoint.longitude))
         }
         
         // Update polylines

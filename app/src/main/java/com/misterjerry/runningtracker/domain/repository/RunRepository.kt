@@ -2,11 +2,14 @@ package com.misterjerry.runningtracker.domain.repository
 
 import com.misterjerry.runningtracker.domain.model.Run
 import kotlinx.coroutines.flow.Flow
+import org.osmdroid.util.GeoPoint
 
 interface RunRepository {
     suspend fun insertRun(run: Run)
     suspend fun deleteRun(run: Run)
     suspend fun getRunById(id: Int): Run?
+    suspend fun getLastKnownLocation(): GeoPoint?
+    suspend fun saveLastKnownLocation(geoPoint: GeoPoint)
     fun getAllRunsSortedByDate(): Flow<List<Run>>
     fun getAllRunsSortedByTimeInMillis(): Flow<List<Run>>
     fun getAllRunsSortedByCaloriesBurned(): Flow<List<Run>>

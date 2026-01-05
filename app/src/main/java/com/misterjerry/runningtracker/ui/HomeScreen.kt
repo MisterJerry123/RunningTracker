@@ -66,7 +66,8 @@ fun HomeScreen(
 
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.Top
         ) { page ->
             when (page) {
                 0 -> ExerciseTab(navController, viewModel)
@@ -137,6 +138,7 @@ fun HistoryTab(navController: NavController, viewModel: MainViewModel) {
         }
     } else {
         LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
         ) {
             items(runs) { run ->

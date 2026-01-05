@@ -54,6 +54,7 @@ dependencies {
     // Maps & Location
     implementation(libs.osmdroid.android)
     implementation(libs.play.services.location)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Room
     implementation(libs.androidx.room.runtime)
