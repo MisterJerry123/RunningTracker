@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.misterjerry.runningtracker"
-    compileSdk = 35 // Targeting stable
+    compileSdk = 36 // Targeting stable
 
     defaultConfig {
         applicationId = "com.misterjerry.runningtracker"
@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation.compose)
 
     // Maps & Location
     implementation(libs.google.maps.compose)
