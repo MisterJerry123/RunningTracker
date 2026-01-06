@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.ui
+package com.misterjerry.runningtracker.ui.Home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -22,8 +22,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.misterjerry.runningtracker.MainViewModel
 import com.misterjerry.runningtracker.domain.model.Run
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -42,8 +38,10 @@ import java.util.Locale
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    viewModel: MainViewModel
+    state: HomeState,
+    onStartRunClick: () -> Unit,
+    onRunClick: (Int) -> Unit,
+    onDeleteRunClick: (Run) -> Unit
 ) {
     val tabs = listOf("운동하기", "기록")
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -70,24 +68,25 @@ fun HomeScreen(
             verticalAlignment = Alignment.Top
         ) { page ->
             when (page) {
-                0 -> ExerciseTab(navController, viewModel)
-                1 -> HistoryTab(navController, viewModel)
+                0 -> ExerciseTab(onStartRunClick = onStartRunClick)
+                1 -> HistoryTab(
+                    state = state,
+                    onRunClick = onRunClick,
+                    onDeleteRunClick = onDeleteRunClick
+                )
             }
         }
     }
 }
 
 @Composable
-fun ExerciseTab(navController: NavController, viewModel: MainViewModel) {
+fun ExerciseTab(onStartRunClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Button(
-            onClick = {
-                viewModel.startRun()
-                navController.navigate("run_screen")
-            },
+            onClick = onStartRunClick,
             modifier = Modifier.fillMaxWidth(0.5f)
         ) {
             Text(text = "운동 시작")
@@ -97,8 +96,12 @@ fun ExerciseTab(navController: NavController, viewModel: MainViewModel) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HistoryTab(navController: NavController, viewModel: MainViewModel) {
-    val runs by viewModel.runs.collectAsState()
+fun HistoryTab(
+    state: HomeState,
+    onRunClick: (Int) -> Unit,
+    onDeleteRunClick: (Run) -> Unit
+) {
+    val runs = state.runs
     val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault())
     var runToDelete by remember { mutableStateOf<Run?>(null) }
 
@@ -110,7 +113,7 @@ fun HistoryTab(navController: NavController, viewModel: MainViewModel) {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        runToDelete?.let { viewModel.deleteRun(it) }
+                        runToDelete?.let { onDeleteRunClick(it) }
                         runToDelete = null
                     }
                 ) {
@@ -147,7 +150,7 @@ fun HistoryTab(navController: NavController, viewModel: MainViewModel) {
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                         .combinedClickable(
-                            onClick = { navController.navigate("run_detail_screen/${run.id}") },
+                            onClick = { onRunClick(run.id) },
                             onLongClick = { runToDelete = run }
                         ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
