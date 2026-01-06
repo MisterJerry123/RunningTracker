@@ -35,11 +35,15 @@
 
 ## 📱 스크린샷
 
-| 홈 화면 | 러닝 기록 중 화면 | 기록 화면 | 상세 기록(지도) |
-|:---:|:---:|:---:|:---:|
-| <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/0f111cb7-71ee-4756-a117-ccc998e2435a" /> | <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/9ac3785a-c9c3-4aa2-85e1-ce0f2d6fed2b" /> |<img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/a094c939-4238-4fac-bfd0-d0f2d4aa1356" /> | <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/643a8f02-f2c8-4aa4-b501-731bc0cd7e7d" /> |
+| 홈 화면 | 러닝 기록 중 화면 | 기록 화면 |기록 삭제 화면(다이얼로그) | 상세 기록(지도) |
+|:---:|:---:|:---:|:---:|:---:|
+| <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/0f111cb7-71ee-4756-a117-ccc998e2435a" /> | <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/9ac3785a-c9c3-4aa2-85e1-ce0f2d6fed2b" /> |<img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/a094c939-4238-4fac-bfd0-d0f2d4aa1356" /> |<img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/0c279105-e342-43b5-a661-629b167ea2cf" />| <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/643a8f02-f2c8-4aa4-b501-731bc0cd7e7d" /> |
 
 ## 📄 라이선스 (License)
 
 Copyright © 2026 MisterJerry. All rights reserved.
 이 프로젝트의 소스 코드에 대한 무단 전재 및 재배포를 금지합니다.
+
+
+
+
