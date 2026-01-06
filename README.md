@@ -45,11 +45,9 @@
 
 ## 📱 스크린샷
 
-| 홈 화면 | 러닝 기록 중 | 상세 기록(지도) |
-|:---:|:---:|:---:|
-| <img src="docs/home.png" width="200" /> | <img src="docs/tracking.png" width="200" /> | <img src="docs/detail.png" width="200" /> |
-
-*(스크린샷 이미지는 `docs` 폴더에 추가 후 경로를 수정해주세요)*
+| 홈 화면 | 러닝 기록 중 화면 | 기록 화면 | 상세 기록(지도) |
+|:---:|:---:|:---:|:---:|
+| <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/0f111cb7-71ee-4756-a117-ccc998e2435a" /> | <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/9ac3785a-c9c3-4aa2-85e1-ce0f2d6fed2b" /> |<img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/a094c939-4238-4fac-bfd0-d0f2d4aa1356" /> | <img width="270" height="606" alt="image" src="https://github.com/user-attachments/assets/643a8f02-f2c8-4aa4-b501-731bc0cd7e7d" /> |
 
 ## 📄 라이선스 (License)
 
