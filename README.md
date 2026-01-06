@@ -51,6 +51,7 @@
 
 *(스크린샷 이미지는 `docs` 폴더에 추가 후 경로를 수정해주세요)*
 
-## 📄 라이선스
+## 📄 라이선스 (License)
 
-This project is licensed under the [MIT License](LICENSE).
+Copyright © 2026 MisterJerry. All rights reserved.
+이 프로젝트의 소스 코드에 대한 무단 전재 및 재배포를 금지합니다.
