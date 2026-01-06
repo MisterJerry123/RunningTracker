@@ -20,28 +20,18 @@
 *   **Maps**: osmdroid (OpenStreetMap)
 *   **Ads**: Google Mobile Ads SDK
 
-## ⚙️ 설정 및 빌드 (Setup)
+## 🚀 비공개 테스트 참여 방법 (Join Closed Testing)
 
-이 프로젝트를 빌드하고 실행하기 위해서는 `local.properties` 설정이 권장됩니다.
+이 앱은 현재 **Google Play Store**의 비공개 테스트 트랙을 통해 관리되고 있습니다. 아래 절차에 따라 테스트에 참여하실 수 있습니다.
 
-1.  **프로젝트 클론**
-    ```bash
-    git clone https://github.com/MisterJerry123/RunningTracker.git
-    ```
+1.  **테스터 그룹 참여**: 아래 Google 그룹에 가입해야 테스트 참여 권한이 부여됩니다.
+    *   [Google 그룹 참여하기](https://groups.google.com/u/2/g/hustledooalarm-tester)
+2.  **테스트 참여 신청 및 앱 설치**:
+    *   **Android에서 참여**: [Android PlayStore에서 설치](https://play.google.com/store/apps/details?id=com.misterjerry.runningtracker)
+    *   **Web에서 참여**: [Web PlayStore에서 설치](https://play.google.com/apps/testing/com.misterjerry.runningtracker)
 
-2.  **`local.properties` 설정**
-    AdMob ID를 안전하게 관리하기 위해 프로젝트 루트의 `local.properties` 파일에 다음 변수들을 추가해주세요. 설정하지 않을 경우 테스트 ID가 기본값으로 사용됩니다.
+*현재 등록된 내부 테스터를 대상으로 기능 및 안정성을 검증하고 있으며, 테스트 완료 후 정식 출시될 예정입니다.*
 
-    ```properties
-    # Google AdMob App ID
-    admob_app_id=ca-app-pub-YOUR_APP_ID~YOUR_ID
-    
-    # Run Detail Screen Banner Ad Unit ID
-    admob_run_detail_screen_top_banner_id=ca-app-pub-YOUR_ID/YOUR_UNIT_ID
-    ```
-
-3.  **빌드 및 실행**
-    Android Studio에서 프로젝트를 열고 `Run` 버튼을 눌러 빌드하세요.
 
 ## 📱 스크린샷
 
