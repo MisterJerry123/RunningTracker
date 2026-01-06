@@ -3,12 +3,13 @@ package com.misterjerry.runningtracker.ui.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+import com.misterjerry.runningtracker.domain.model.Run
 
 @Composable
 fun HomeRoot(
-    navController: NavController,
+    onStartRunClick: () -> Unit,
+    onRunClick: (Int) -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -17,11 +18,9 @@ fun HomeRoot(
         state = state,
         onStartRunClick = {
             viewModel.startRun()
-            navController.navigate("run_screen")
+            onStartRunClick()
         },
-        onRunClick = { id ->
-            navController.navigate("run_detail_screen/$id")
-        },
+        onRunClick = onRunClick,
         onDeleteRunClick = { run ->
             viewModel.deleteRun(run)
         }
