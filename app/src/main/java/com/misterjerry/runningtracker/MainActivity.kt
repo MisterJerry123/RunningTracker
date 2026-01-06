@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.android.gms.ads.MobileAds
 import com.misterjerry.runningtracker.ui.HomeScreen
 import com.misterjerry.runningtracker.ui.RunDetailScreen
 import com.misterjerry.runningtracker.ui.RunScreen
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        MobileAds.initialize(this) {}
         requestPermissions()
         navigateToTrackingFragmentIfNeeded(intent)
 

@@ -1,9 +1,20 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val admobAppId = localProperties.getProperty("admob_app_id") ?: "ca-app-pub-3940256099942544~3347511713"
+val admobBannerId = localProperties.getProperty("admob_run_detail_screen_top_banner_id") ?: "ca-app-pub-3940256099942544/6300978111"
 
 android {
     namespace = "com.misterjerry.runningtracker"
@@ -17,6 +28,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        manifestPlaceholders["admob_app_id"] = admobAppId
+        buildConfigField("String", "ADMOB_RUN_DETAIL_SCREEN_TOP_BANNER_ID", "\"$admobBannerId\"")
     }
 
     buildTypes {
@@ -37,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -56,6 +71,9 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
+    
+    // Ads
+    implementation(libs.play.services.ads)
 
     // Room
     implementation(libs.androidx.room.runtime)
