@@ -1,5 +1,6 @@
-package com.misterjerry.runningtracker.ui
+package com.misterjerry.runningtracker.ui.RunDetail
 
+import android.graphics.Color
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -7,46 +8,35 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavController
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.misterjerry.runningtracker.BuildConfig
-import com.misterjerry.runningtracker.MainViewModel
-import com.misterjerry.runningtracker.domain.model.Run
+import com.misterjerry.runningtracker.ui.Home.formatTime
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 
 @Composable
 fun RunDetailScreen(
-    navController: NavController,
-    viewModel: MainViewModel,
-    runId: Int
+    state: RunDetailState
 ) {
-    var run by remember { mutableStateOf<Run?>(null) }
+    val run = state.run
     val context = LocalContext.current
-
-    LaunchedEffect(runId) {
-        run = viewModel.getRunById(runId)
-    }
 
     val mapView = remember {
         MapView(context).apply {
@@ -64,7 +54,7 @@ fun RunDetailScreen(
             r.pathPoints.forEach { polylinePoints ->
                 if (polylinePoints.isNotEmpty()) {
                     val polyline = Polyline().apply {
-                        outlinePaint.color = android.graphics.Color.RED
+                        outlinePaint.color = Color.RED
                         outlinePaint.strokeWidth = 10f
                         setPoints(polylinePoints)
                     }
@@ -75,7 +65,7 @@ fun RunDetailScreen(
             
             if (allPoints.isNotEmpty()) {
                 // Calculate bounds and zoom to fit
-                val bounds = org.osmdroid.util.BoundingBox.fromGeoPoints(allPoints)
+                val bounds = BoundingBox.fromGeoPoints(allPoints)
                 // Animate to bounds with padding
                  mapView.zoomToBoundingBox(bounds, true, 100)
             }
