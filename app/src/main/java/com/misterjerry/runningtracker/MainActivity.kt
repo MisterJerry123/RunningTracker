@@ -16,7 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.google.android.gms.ads.MobileAds
 import com.misterjerry.runningtracker.core.routing.NavigationRoot
-import com.misterjerry.runningtracker.ui.theme.RunningTrackerTheme
+import com.misterjerry.runningtracker.presentation.theme.RunningTrackerTheme
 import com.misterjerry.runningtracker.util.Constants.ACTION_SHOW_TRACKING_FRAGMENT
 import com.misterjerry.runningtracker.util.PermissionUtils
 

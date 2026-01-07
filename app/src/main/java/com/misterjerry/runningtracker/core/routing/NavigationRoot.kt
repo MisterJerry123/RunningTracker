@@ -8,9 +8,9 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.misterjerry.runningtracker.service.TrackingService
-import com.misterjerry.runningtracker.ui.Home.HomeRoot
-import com.misterjerry.runningtracker.ui.Run.RunRoot
-import com.misterjerry.runningtracker.ui.RunDetail.RunDetailRoot
+import com.misterjerry.runningtracker.presentation.Home.HomeRoot
+import com.misterjerry.runningtracker.presentation.Run.RunRoot
+import com.misterjerry.runningtracker.presentation.RunDetail.RunDetailRoot
 
 @Composable
 fun NavigationRoot() {
