@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.ui
+package com.misterjerry.runningtracker.ui.Run
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -17,20 +17,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.navigation.NavController
-import com.misterjerry.runningtracker.MainViewModel
+import com.misterjerry.runningtracker.ui.Home.formatTime
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -41,15 +38,13 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 @Composable
 fun RunScreen(
-    navController: NavController,
-    viewModel: MainViewModel
+    state: RunState,
+    onStartRunClick: () -> Unit,
+    onPauseRunClick: () -> Unit,
+    onStopRunClick: (Context) -> Unit
 ) {
-    val isTracking by viewModel.isTracking.collectAsState()
-    val pathPoints by viewModel.pathPoints.collectAsState()
-    val timeInMillis by viewModel.timeRunInMillis.collectAsState()
-    val initialLocation by viewModel.initialLocation.collectAsState()
     val context = LocalContext.current
-    
+
     // Initialize osmdroid configuration with explicit user agent
     Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
     Configuration.getInstance().userAgentValue = context.packageName
@@ -61,15 +56,15 @@ fun RunScreen(
             controller.setZoom(17.0)
         }
     }
-    
-    LaunchedEffect(initialLocation) {
-        initialLocation?.let {
-            if (pathPoints.isEmpty() || pathPoints.first().isEmpty()) {
+
+    LaunchedEffect(state.initialLocation) {
+        state.initialLocation?.let {
+            if (state.pathPoints.isEmpty() || state.pathPoints.firstOrNull()?.isEmpty() == true) {
                  mapView.controller.setCenter(it)
             }
         }
     }
-    
+
     // Lifecycle observer for MapView
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -92,22 +87,22 @@ fun RunScreen(
             enableFollowLocation()
         }
     }
-    
+
     LaunchedEffect(Unit) {
         mapView.overlays.add(locationOverlay)
     }
 
-    LaunchedEffect(pathPoints) {
-        if (pathPoints.isNotEmpty() && pathPoints.last().isNotEmpty()) {
-            val lastPoint = pathPoints.last().last()
+    LaunchedEffect(state.pathPoints) {
+        if (state.pathPoints.isNotEmpty() && state.pathPoints.last().isNotEmpty()) {
+            val lastPoint = state.pathPoints.last().last()
             mapView.controller.setCenter(GeoPoint(lastPoint.latitude, lastPoint.longitude))
         }
-        
+
         // Update polylines
         mapView.overlays.clear()
-        
+
         // 1. Add Polylines first (bottom layer)
-        pathPoints.forEach { pointList ->
+        state.pathPoints.forEach { pointList ->
             if (pointList.size > 1) {
                 val polyline = Polyline().apply {
                     outlinePaint.color = android.graphics.Color.GREEN
@@ -117,10 +112,10 @@ fun RunScreen(
                 mapView.overlays.add(polyline)
             }
         }
-        
+
         // 2. Add Location Overlay last (top layer)
         mapView.overlays.add(locationOverlay)
-        
+
         mapView.invalidate()
     }
 
@@ -140,7 +135,7 @@ fun RunScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = formatTime(timeInMillis),
+                text = formatTime(state.timeInMillis),
                 style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -148,26 +143,23 @@ fun RunScreen(
             Row {
                 Button(
                     onClick = {
-                        if (isTracking) {
-                            viewModel.pauseRun()
+                        if (state.isTracking) {
+                            onPauseRunClick()
                         } else {
-                            viewModel.startRun()
+                            onStartRunClick()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isTracking) Color.Yellow else Color.Green,
+                        containerColor = if (state.isTracking) Color.Yellow else Color.Green,
                         contentColor = Color.Black
                     )
                 ) {
-                    Text(text = if (isTracking) "일시정지" else "계속하기")
+                    Text(text = if (state.isTracking) "일시정지" else "계속하기")
                 }
-                androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(8.dp))
+                Spacer(modifier = Modifier.padding(8.dp))
                 Button(
                     onClick = {
-                        viewModel.stopRun(navController.context, null)
-                        navController.navigate("home_screen") {
-                            popUpTo("home_screen") { inclusive = true }
-                        }
+                        onStopRunClick(context)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {

@@ -1,0 +1,60 @@
+package com.misterjerry.runningtracker.core.di
+
+import android.content.Context
+import com.google.android.gms.location.LocationServices
+import com.misterjerry.runningtracker.data.RunDatabase
+import com.misterjerry.runningtracker.data.repository.RunRepositoryImpl
+import com.misterjerry.runningtracker.domain.repository.RunRepository
+import com.misterjerry.runningtracker.domain.usecase.DeleteRunUseCase
+import com.misterjerry.runningtracker.domain.usecase.GetLastLocationUseCase
+import com.misterjerry.runningtracker.domain.usecase.GetRunByIdUseCase
+import com.misterjerry.runningtracker.domain.usecase.GetRunsUseCase
+import com.misterjerry.runningtracker.domain.usecase.SaveLastLocationUseCase
+import com.misterjerry.runningtracker.domain.usecase.SaveRunUseCase
+import com.misterjerry.runningtracker.ui.Home.HomeViewModel
+import com.misterjerry.runningtracker.ui.Run.RunViewModel
+import com.misterjerry.runningtracker.ui.RunDetail.RunDetailViewModel
+import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
+
+val appModule = module {
+    single { RunDatabase.getDatabase(androidApplication()).getRunDao() }
+    single { androidContext().getSharedPreferences("shared_prefs", Context.MODE_PRIVATE) }
+    single { LocationServices.getFusedLocationProviderClient(androidApplication()) }
+    
+    single<RunRepository> { 
+        RunRepositoryImpl(get(), get(), get()) 
+    }
+
+    factory { GetRunsUseCase(get()) }
+    factory { SaveRunUseCase(get()) }
+    factory { DeleteRunUseCase(get()) }
+    factory { GetRunByIdUseCase(get()) }
+    factory { GetLastLocationUseCase(get()) }
+    factory { SaveLastLocationUseCase(get()) }
+
+    viewModel {
+        HomeViewModel(
+            androidApplication(),
+            get(),
+            get()
+        )
+    }
+
+    viewModel {
+        RunViewModel(
+            androidApplication(),
+            get(),
+            get(),
+            get()
+        )
+    }
+
+    viewModel {
+        RunDetailViewModel(
+            get()
+        )
+    }
+}

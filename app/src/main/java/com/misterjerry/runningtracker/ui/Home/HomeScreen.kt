@@ -1,6 +1,8 @@
-package com.misterjerry.runningtracker.ui
+package com.misterjerry.runningtracker.ui.Home
 
+import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +24,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.misterjerry.runningtracker.MainViewModel
+import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.misterjerry.runningtracker.BuildConfig
 import com.misterjerry.runningtracker.domain.model.Run
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -42,52 +45,72 @@ import java.util.Locale
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    viewModel: MainViewModel
+    state: HomeState,
+    onStartRunClick: () -> Unit,
+    onRunClick: (Int) -> Unit,
+    onDeleteRunClick: (Run) -> Unit
 ) {
     val tabs = listOf("운동하기", "기록")
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(selectedTabIndex = pagerState.currentPage) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    },
-                    text = { Text(title) }
-                )
+        Column(modifier = Modifier.weight(1f)) {
+            TabRow(selectedTabIndex = pagerState.currentPage) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
+                        text = { Text(title) }
+                    )
+                }
             }
-        }
 
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.Top
-        ) { page ->
-            when (page) {
-                0 -> ExerciseTab(navController, viewModel)
-                1 -> HistoryTab(navController, viewModel)
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.Top
+            ) { page ->
+                when (page) {
+                    0 -> ExerciseTab(onStartRunClick = onStartRunClick)
+                    1 -> HistoryTab(
+                        state = state,
+                        onRunClick = onRunClick,
+                        onDeleteRunClick = onDeleteRunClick
+                    )
+                }
             }
         }
+        
+        AndroidView(
+            modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface),
+            factory = { context ->
+                AdView(context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setAdSize(AdSize.BANNER)
+                    adUnitId = BuildConfig.ADMOB_RUN_SCREEN_BOTTOM_BANNER_ID
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
     }
 }
 
 @Composable
-fun ExerciseTab(navController: NavController, viewModel: MainViewModel) {
+fun ExerciseTab(onStartRunClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Button(
-            onClick = {
-                viewModel.startRun()
-                navController.navigate("run_screen")
-            },
+            onClick = onStartRunClick,
             modifier = Modifier.fillMaxWidth(0.5f)
         ) {
             Text(text = "운동 시작")
@@ -97,8 +120,12 @@ fun ExerciseTab(navController: NavController, viewModel: MainViewModel) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HistoryTab(navController: NavController, viewModel: MainViewModel) {
-    val runs by viewModel.runs.collectAsState()
+fun HistoryTab(
+    state: HomeState,
+    onRunClick: (Int) -> Unit,
+    onDeleteRunClick: (Run) -> Unit
+) {
+    val runs = state.runs
     val dateFormat = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault())
     var runToDelete by remember { mutableStateOf<Run?>(null) }
 
@@ -110,7 +137,7 @@ fun HistoryTab(navController: NavController, viewModel: MainViewModel) {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        runToDelete?.let { viewModel.deleteRun(it) }
+                        runToDelete?.let { onDeleteRunClick(it) }
                         runToDelete = null
                     }
                 ) {
@@ -147,7 +174,7 @@ fun HistoryTab(navController: NavController, viewModel: MainViewModel) {
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                         .combinedClickable(
-                            onClick = { navController.navigate("run_detail_screen/${run.id}") },
+                            onClick = { onRunClick(run.id) },
                             onLongClick = { runToDelete = run }
                         ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
@@ -5,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+
 }
 
 val localProperties = Properties()
@@ -14,7 +17,8 @@ if (localPropertiesFile.exists()) {
 }
 
 val admobAppId = localProperties.getProperty("admob_app_id") ?: "ca-app-pub-3940256099942544~3347511713"
-val admobBannerId = localProperties.getProperty("admob_run_detail_screen_top_banner_id") ?: "ca-app-pub-3940256099942544/6300978111"
+val admobRunDetailBannerId = localProperties.getProperty("admob_run_detail_screen_top_banner_id") ?: "ca-app-pub-3940256099942544/6300978111"
+val admobHomeBannerId = localProperties.getProperty("admob_home_screen_bottom_banner_id") ?: "ca-app-pub-3940256099942544/6300978111"
 
 android {
     namespace = "com.misterjerry.runningtracker"
@@ -30,7 +34,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         manifestPlaceholders["admob_app_id"] = admobAppId
-        buildConfigField("String", "ADMOB_RUN_DETAIL_SCREEN_TOP_BANNER_ID", "\"$admobBannerId\"")
+        buildConfigField("String", "ADMOB_RUN_DETAIL_SCREEN_TOP_BANNER_ID", "\"$admobRunDetailBannerId\"")
+        buildConfigField("String", "ADMOB_RUN_SCREEN_BOTTOM_BANNER_ID", "\"$admobHomeBannerId\"")
     }
 
     buildTypes {
@@ -46,8 +51,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         compose = true
@@ -65,7 +73,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.navigation.compose)
+
 
     // Maps & Location
     implementation(libs.osmdroid.android)
@@ -81,6 +89,10 @@ dependencies {
     implementation(libs.google.gson)
     ksp(libs.androidx.room.compiler)
 
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,4 +100,11 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    //nav3
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.material3.adaptive.navigation3)
+    implementation(libs.kotlinx.serialization.core)
 }
