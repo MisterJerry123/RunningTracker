@@ -14,7 +14,7 @@ fun RunDetailRoot(
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(runId) {
-        viewModel.loadRun(runId)
+        viewModel.onAction(RunDetailAction.LoadRun(runId))
     }
 
     RunDetailScreen(

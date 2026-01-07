@@ -15,10 +15,14 @@ class RunDetailViewModel(
     private val _state = MutableStateFlow(RunDetailState())
     val state = _state.asStateFlow()
 
-    fun loadRun(id: Int) {
-        viewModelScope.launch {
-            val run = getRunByIdUseCase(id)
-            _state.update { it.copy(run = run) }
+    fun onAction(action: RunDetailAction) {
+        when(action) {
+            is RunDetailAction.LoadRun -> {
+                viewModelScope.launch {
+                    val run = getRunByIdUseCase(action.id)
+                    _state.update { it.copy(run = run) }
+                }
+            }
         }
     }
 }
