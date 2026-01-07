@@ -16,7 +16,7 @@ import com.misterjerry.runningtracker.presentation.Run.RunViewModel
 import com.misterjerry.runningtracker.presentation.RunDetail.RunDetailViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
@@ -35,17 +35,24 @@ val appModule = module {
     factory { GetLastLocationUseCase(get()) }
     factory { SaveLastLocationUseCase(get()) }
 
-    viewModel {
+//    viewModel {
+//        HomeViewModel(
+//            androidApplication(),
+//            get(),
+//            get()
+//        )
+//    }
+    viewModel<HomeViewModel> {
         HomeViewModel(
-            androidApplication(),
+            androidContext(),
             get(),
-            get()
+            get(),
         )
     }
 
     viewModel {
         RunViewModel(
-            androidApplication(),
+            androidContext(),
             get(),
             get(),
             get()

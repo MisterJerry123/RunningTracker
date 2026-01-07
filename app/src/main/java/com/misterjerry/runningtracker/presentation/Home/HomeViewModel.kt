@@ -1,8 +1,11 @@
 package com.misterjerry.runningtracker.presentation.Home
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misterjerry.runningtracker.domain.model.Run
 import com.misterjerry.runningtracker.domain.usecase.DeleteRunUseCase
@@ -15,10 +18,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    application: Application,
-    getRunsUseCase: GetRunsUseCase,
+    private val context: Context,
+    private val getRunsUseCase: GetRunsUseCase,
     private val deleteRunUseCase: DeleteRunUseCase
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     val state = getRunsUseCase()
         .map { HomeState(runs = it) }
@@ -29,9 +32,9 @@ class HomeViewModel(
         )
 
     fun startRun() {
-        Intent(getApplication(), TrackingService::class.java).also {
+        Intent(context, TrackingService::class.java).also {
             it.action = ACTION_START_OR_RESUME_SERVICE
-            getApplication<Application>().startService(it)
+            context.startService(it)
         }
     }
 

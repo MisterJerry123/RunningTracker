@@ -1,10 +1,9 @@
 package com.misterjerry.runningtracker.presentation.Run
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misterjerry.runningtracker.domain.model.Run
 import com.misterjerry.runningtracker.domain.usecase.GetLastLocationUseCase
@@ -21,11 +20,11 @@ import org.osmdroid.util.GeoPoint
 import java.util.Calendar
 
 class RunViewModel(
-    application: Application,
+    private val context: Context,
     private val saveRunUseCase: SaveRunUseCase,
     private val getLastLocationUseCase: GetLastLocationUseCase,
     private val saveLastLocationUseCase: SaveLastLocationUseCase
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _initialLocation = MutableStateFlow<GeoPoint?>(null)
 
@@ -113,9 +112,9 @@ class RunViewModel(
     }
 
     private fun sendCommandToService(action: String) {
-        Intent(getApplication(), TrackingService::class.java).also {
+        Intent(context, TrackingService::class.java).also {
             it.action = action
-            getApplication<Application>().startService(it)
+            context.startService(it)
         }
     }
 
