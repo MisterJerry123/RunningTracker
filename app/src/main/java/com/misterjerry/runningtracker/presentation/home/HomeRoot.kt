@@ -16,12 +16,12 @@ fun HomeRoot(
     HomeScreen(
         state = state,
         onStartRunClick = {
-            viewModel.startRun()
+            viewModel.onAction(HomeAction.StartRun)
             onStartRunClick()
         },
         onRunClick = onRunClick,
         onDeleteRunClick = { run ->
-            viewModel.deleteRun(run)
+            viewModel.onAction(HomeAction.DeleteRun(run))
         }
     )
 }

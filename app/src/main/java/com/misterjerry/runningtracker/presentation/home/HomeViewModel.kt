@@ -3,7 +3,6 @@ package com.misterjerry.runningtracker.presentation.home
 import com.misterjerry.runningtracker.domain.usecase.StartRunUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.misterjerry.runningtracker.domain.model.Run
 import com.misterjerry.runningtracker.domain.usecase.DeleteRunUseCase
 import com.misterjerry.runningtracker.domain.usecase.GetRunsUseCase
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,13 +24,16 @@ class HomeViewModel(
             initialValue = HomeState()
         )
 
-    fun startRun() {
-        startRunUseCase()
-    }
-
-    fun deleteRun(run: Run) {
-        viewModelScope.launch {
-            deleteRunUseCase(run)
+    fun onAction(action: HomeAction) {
+        when (action) {
+            HomeAction.StartRun -> {
+                startRunUseCase()
+            }
+            is HomeAction.DeleteRun -> {
+                viewModelScope.launch {
+                    deleteRunUseCase(action.run)
+                }
+            }
         }
     }
 }
