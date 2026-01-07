@@ -1,18 +1,25 @@
 package com.misterjerry.runningtracker.core.routing
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.misterjerry.runningtracker.service.TrackingService
 import com.misterjerry.runningtracker.ui.Home.HomeRoot
 import com.misterjerry.runningtracker.ui.Run.RunRoot
 import com.misterjerry.runningtracker.ui.RunDetail.RunDetailRoot
 
 @Composable
 fun NavigationRoot() {
-    val backStack = rememberNavBackStack(Route.Home)
+    val isSessionInProgress = remember { TrackingService.pathPoints.value.isNotEmpty() }
+    val backStack = if (isSessionInProgress) {
+        rememberNavBackStack(Route.Home, Route.Run)
+    } else {
+        rememberNavBackStack(Route.Home)
+    }
 
     NavDisplay(
         backStack = backStack,
