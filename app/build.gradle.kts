@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
@@ -16,7 +17,8 @@ if (localPropertiesFile.exists()) {
 }
 
 val admobAppId = localProperties.getProperty("admob_app_id") ?: "ca-app-pub-3940256099942544~3347511713"
-val admobBannerId = localProperties.getProperty("admob_run_detail_screen_top_banner_id") ?: "ca-app-pub-3940256099942544/6300978111"
+val admobRunDetailBannerId = localProperties.getProperty("admob_run_detail_screen_top_banner_id") ?: "ca-app-pub-3940256099942544/6300978111"
+val admobHomeBannerId = localProperties.getProperty("admob_home_screen_bottom_banner_id") ?: "ca-app-pub-3940256099942544/6300978111"
 
 android {
     namespace = "com.misterjerry.runningtracker"
@@ -32,7 +34,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         manifestPlaceholders["admob_app_id"] = admobAppId
-        buildConfigField("String", "ADMOB_RUN_DETAIL_SCREEN_TOP_BANNER_ID", "\"$admobBannerId\"")
+        buildConfigField("String", "ADMOB_RUN_DETAIL_SCREEN_TOP_BANNER_ID", "\"$admobRunDetailBannerId\"")
+        buildConfigField("String", "ADMOB_RUN_SCREEN_BOTTOM_BANNER_ID", "\"$admobHomeBannerId\"")
     }
 
     buildTypes {
@@ -48,8 +51,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         compose = true

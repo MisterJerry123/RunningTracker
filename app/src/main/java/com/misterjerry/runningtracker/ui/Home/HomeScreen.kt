@@ -1,6 +1,8 @@
 package com.misterjerry.runningtracker.ui.Home
 
+import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.misterjerry.runningtracker.BuildConfig
 import com.misterjerry.runningtracker.domain.model.Run
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -48,34 +55,51 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(selectedTabIndex = pagerState.currentPage) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    },
-                    text = { Text(title) }
-                )
+        Column(modifier = Modifier.weight(1f)) {
+            TabRow(selectedTabIndex = pagerState.currentPage) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
+                        text = { Text(title) }
+                    )
+                }
             }
-        }
 
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.Top
-        ) { page ->
-            when (page) {
-                0 -> ExerciseTab(onStartRunClick = onStartRunClick)
-                1 -> HistoryTab(
-                    state = state,
-                    onRunClick = onRunClick,
-                    onDeleteRunClick = onDeleteRunClick
-                )
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.Top
+            ) { page ->
+                when (page) {
+                    0 -> ExerciseTab(onStartRunClick = onStartRunClick)
+                    1 -> HistoryTab(
+                        state = state,
+                        onRunClick = onRunClick,
+                        onDeleteRunClick = onDeleteRunClick
+                    )
+                }
             }
         }
+        
+        AndroidView(
+            modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface),
+            factory = { context ->
+                AdView(context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setAdSize(AdSize.BANNER)
+                    adUnitId = BuildConfig.ADMOB_RUN_SCREEN_BOTTOM_BANNER_ID
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
     }
 }
 

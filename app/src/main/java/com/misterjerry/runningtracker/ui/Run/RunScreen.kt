@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -44,7 +44,7 @@ fun RunScreen(
     onStopRunClick: (Context) -> Unit
 ) {
     val context = LocalContext.current
-    
+
     // Initialize osmdroid configuration with explicit user agent
     Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
     Configuration.getInstance().userAgentValue = context.packageName
@@ -56,7 +56,7 @@ fun RunScreen(
             controller.setZoom(17.0)
         }
     }
-    
+
     LaunchedEffect(state.initialLocation) {
         state.initialLocation?.let {
             if (state.pathPoints.isEmpty() || state.pathPoints.firstOrNull()?.isEmpty() == true) {
@@ -64,7 +64,7 @@ fun RunScreen(
             }
         }
     }
-    
+
     // Lifecycle observer for MapView
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -87,7 +87,7 @@ fun RunScreen(
             enableFollowLocation()
         }
     }
-    
+
     LaunchedEffect(Unit) {
         mapView.overlays.add(locationOverlay)
     }
@@ -97,10 +97,10 @@ fun RunScreen(
             val lastPoint = state.pathPoints.last().last()
             mapView.controller.setCenter(GeoPoint(lastPoint.latitude, lastPoint.longitude))
         }
-        
+
         // Update polylines
         mapView.overlays.clear()
-        
+
         // 1. Add Polylines first (bottom layer)
         state.pathPoints.forEach { pointList ->
             if (pointList.size > 1) {
@@ -112,10 +112,10 @@ fun RunScreen(
                 mapView.overlays.add(polyline)
             }
         }
-        
+
         // 2. Add Location Overlay last (top layer)
         mapView.overlays.add(locationOverlay)
-        
+
         mapView.invalidate()
     }
 
