@@ -29,8 +29,8 @@ android {
         applicationId = "com.misterjerry.runningtracker"
         minSdk = 26 // Android 8.0 for notification channels/foreground service goodies
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
