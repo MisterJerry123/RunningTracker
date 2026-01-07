@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.ui.Run
+package com.misterjerry.runningtracker.presentation.Run
 
 import android.app.Activity
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.ui.RunDetail
+package com.misterjerry.runningtracker.presentation.RunDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

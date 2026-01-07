@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.ui.Home
+package com.misterjerry.runningtracker.presentation.Home
 
 import android.app.Application
 import android.content.Intent

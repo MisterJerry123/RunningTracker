@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.ui.theme
+package com.misterjerry.runningtracker.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
