@@ -49,10 +49,10 @@ fun RunRoot(
 
     RunScreen(
         state = state,
-        onStartRunClick = viewModel::startRun,
-        onPauseRunClick = viewModel::pauseRun,
+        onStartRunClick = { viewModel.onAction(RunAction.StartRun) },
+        onPauseRunClick = { viewModel.onAction(RunAction.PauseRun) },
         onStopRunClick = {
-            viewModel.stopRun(null)
+            viewModel.onAction(RunAction.StopRun(null))
             
             if (interstitialAd != null) {
                 interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {

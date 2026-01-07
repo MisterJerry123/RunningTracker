@@ -64,20 +64,19 @@ class RunViewModel(
         }
     }
 
-    fun startRun() {
-        startRunUseCase()
+    fun onAction(action: RunAction) {
+        when(action) {
+            RunAction.StartRun -> startRunUseCase()
+            RunAction.PauseRun -> pauseRunUseCase()
+            is RunAction.StopRun -> stopRun(action.mapScreenshot)
+        }
     }
 
-    fun pauseRun() {
-        pauseRunUseCase()
-    }
-
-    fun stopRun(mapScreenshot: Bitmap?) {
+    private fun stopRun(mapScreenshot: Bitmap?) {
         val currentState = state.value
         val currentPathPoints = currentState.pathPoints
         val lastPolyline = currentPathPoints.lastOrNull() ?: emptyList()
         val timestamp = Calendar.getInstance().timeInMillis
-        val distanceInMeters = calculatePolylineLength(lastPolyline).toInt()
         val totalDistance =
             currentPathPoints.sumOf { calculatePolylineLength(it).toDouble() }.toInt()
         val curTimeInMillis = currentState.timeInMillis
