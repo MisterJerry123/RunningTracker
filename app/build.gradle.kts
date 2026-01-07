@@ -63,6 +63,15 @@ android {
         compose = true
         buildConfig = true
     }
+    flavorDimensions += listOf("version")
+    productFlavors {
+        create("dev") {
+            dimension = "version"
+        }
+        create("prod") {
+            dimension = "version"
+        }
+    }
 }
 
 dependencies {

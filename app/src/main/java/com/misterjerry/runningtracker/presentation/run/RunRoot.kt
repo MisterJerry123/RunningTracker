@@ -3,6 +3,7 @@ package com.misterjerry.runningtracker.presentation.run
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,13 +48,20 @@ fun RunRoot(
         )
     }
 
+    LaunchedEffect(key1 = true) {
+        viewModel.events.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            onFinish()
+        }
+    }
+
     RunScreen(
         state = state,
         onStartRunClick = { viewModel.onAction(RunAction.StartRun) },
         onPauseRunClick = { viewModel.onAction(RunAction.PauseRun) },
         onStopRunClick = {
             viewModel.onAction(RunAction.StopRun)
-            
+
             if (interstitialAd != null) {
                 interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                     override fun onAdDismissedFullScreenContent() {
@@ -64,7 +72,7 @@ fun RunRoot(
                         onFinish()
                     }
                 }
-                
+
                 val activity = context.findActivity()
                 if (activity != null) {
                     interstitialAd?.show(activity)

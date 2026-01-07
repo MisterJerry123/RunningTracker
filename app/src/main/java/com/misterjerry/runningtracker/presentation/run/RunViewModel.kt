@@ -9,10 +9,13 @@ import com.misterjerry.runningtracker.domain.usecase.SaveLastLocationUseCase
 import com.misterjerry.runningtracker.domain.usecase.SaveRunUseCase
 import com.misterjerry.runningtracker.domain.usecase.StartRunUseCase
 import com.misterjerry.runningtracker.domain.usecase.StopRunUseCase
+import android.util.Log
 import com.misterjerry.runningtracker.service.TrackingService
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -28,6 +31,9 @@ class RunViewModel(
 ) : ViewModel() {
 
     private val _initialLocation = MutableStateFlow<GeoPoint?>(null)
+
+    private val eventChannel = Channel<String>()
+    val events = eventChannel.receiveAsFlow()
 
     val state = combine(
         TrackingService.isTracking,
@@ -59,6 +65,14 @@ class RunViewModel(
                     val lastPoint = polylines.last().last()
                     saveLastLocationUseCase(lastPoint)
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            TrackingService.cancelRunEvent.collect { message ->
+                Log.d("RunViewModel", "Received cancelRunEvent: $message")
+                stopRun()
+                eventChannel.send(message)
             }
         }
     }

@@ -47,7 +47,7 @@ fun RunningTrackerTheme(
         SideEffect {
             val window = (view.context as Activity).window
             // window.statusBarColor = colorScheme.primary.toArgb() // Removed for Edge-to-Edge
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

@@ -7,12 +7,17 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.location.Location
+import android.os.BatteryManager.EXTRA_LEVEL
+import android.os.BatteryManager.EXTRA_SCALE
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
+import com.misterjerry.runningtracker.BuildConfig
 import com.misterjerry.runningtracker.MainActivity
 import com.misterjerry.runningtracker.R
 import com.misterjerry.runningtracker.util.Constants.ACTION_PAUSE_SERVICE
@@ -30,6 +35,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -49,10 +58,51 @@ class TrackingService : Service() {
 
     private val timeRunInSeconds = MutableStateFlow(0L)
 
+    private var isBatteryLowWarningEmitted = false
+
     companion object {
         val timeRunInMillis = MutableStateFlow(0L)
         val isTracking = MutableStateFlow(false)
         val pathPoints = MutableStateFlow<Polylines>(mutableListOf())
+        private val _cancelRunEvent = MutableSharedFlow<String>(replay = 1)
+        val cancelRunEvent = _cancelRunEvent.asSharedFlow()
+    }
+
+    private fun batteryFlow() = callbackFlow {
+        val checkBattery = { intent: Intent ->
+            if (BuildConfig.FLAVOR == "dev") {
+                val level = intent.getIntExtra(EXTRA_LEVEL, -1)
+                val scale = intent.getIntExtra(EXTRA_SCALE, -1)
+                val batteryPct = level * 100 / scale.toFloat()
+                
+                Log.d("TrackingService", "Battery level checked: $batteryPct%")
+                
+                if (batteryPct <= 21f && !isBatteryLowWarningEmitted) {
+                    isBatteryLowWarningEmitted = true
+                    Log.d("TrackingService", "Low battery detected (<= 21%). Sending cancel event.")
+                    trySend("배터리가 21% 이하여서 운동이 종료되었습니다.")
+                }
+            }
+        }
+
+        val receiver = object : android.content.BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == Intent.ACTION_BATTERY_CHANGED) {
+                    checkBattery(intent)
+                }
+            }
+        }
+        
+        val initialIntent = registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        initialIntent?.let { checkBattery(it) }
+        
+        awaitClose {
+            try {
+                unregisterReceiver(receiver)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun postInitialValues() {
@@ -60,6 +110,8 @@ class TrackingService : Service() {
         pathPoints.value = mutableListOf()
         timeRunInSeconds.value = 0L
         timeRunInMillis.value = 0L
+        isBatteryLowWarningEmitted = false
+        _cancelRunEvent.resetReplayCache()
     }
 
     override fun onCreate() {
@@ -107,6 +159,12 @@ class TrackingService : Service() {
     private fun startForegroundService() {
         startTimer()
         isTracking.value = true
+        
+        batteryFlow()
+            .onEach { message ->
+                _cancelRunEvent.emit(message)
+            }
+            .launchIn(serviceScope)
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

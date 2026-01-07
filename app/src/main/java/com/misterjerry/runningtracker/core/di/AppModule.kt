@@ -19,6 +19,10 @@ import com.misterjerry.runningtracker.domain.usecase.StopRunUseCase
 import com.misterjerry.runningtracker.presentation.home.HomeViewModel
 import com.misterjerry.runningtracker.presentation.run.RunViewModel
 import com.misterjerry.runningtracker.presentation.runDetail.RunDetailViewModel
+import com.misterjerry.runningtracker.util.BatteryWarningProvider
+import com.misterjerry.runningtracker.util.DevBatteryWarningProvider
+import com.misterjerry.runningtracker.util.ProdBatteryWarningProvider
+import com.misterjerry.runningtracker.BuildConfig
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -35,6 +39,14 @@ val appModule = module {
 
     single<TrackingManager> {
         TrackingManagerImpl(androidContext())
+    }
+
+    single<BatteryWarningProvider> {
+        if (BuildConfig.FLAVOR == "dev") {
+            DevBatteryWarningProvider()
+        } else {
+            ProdBatteryWarningProvider()
+        }
     }
 
     factory { GetRunsUseCase(get()) }
