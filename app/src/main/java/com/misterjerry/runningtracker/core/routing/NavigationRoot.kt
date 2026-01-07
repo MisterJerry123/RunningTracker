@@ -41,8 +41,7 @@ fun NavigationRoot() {
             entry<Route.Run> {
                 RunRoot(
                     onFinish = {
-                        backStack.clear()
-                        backStack.add(Route.Home)
+                        backStack.removeLast()
                     }
                 )
             }
