@@ -57,24 +57,24 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestPermissions() {
-        if (PermissionUtils.hasLocationPermissions(this)) {
-            return
+        val permissionsToRequest = mutableListOf<String>()
+        
+        if (!PermissionUtils.hasLocationPermissions(this)) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                permissionsToRequest.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            requestPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            )
-        } else {
-            requestPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                )
-            )
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            requestPermissionLauncher.launch(permissionsToRequest.toTypedArray())
         }
     }
     

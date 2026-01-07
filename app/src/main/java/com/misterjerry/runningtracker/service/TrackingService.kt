@@ -7,12 +7,12 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
-import org.osmdroid.util.GeoPoint
 import com.misterjerry.runningtracker.MainActivity
 import com.misterjerry.runningtracker.R
 import com.misterjerry.runningtracker.util.Constants.ACTION_PAUSE_SERVICE
@@ -30,12 +30,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
 
 typealias Polyline = MutableList<GeoPoint>
 typealias Polylines = MutableList<Polyline>
@@ -92,9 +91,11 @@ class TrackingService : Service() {
                         }
                     }
                 }
+
                 ACTION_PAUSE_SERVICE -> {
                     pauseService()
                 }
+
                 ACTION_STOP_SERVICE -> {
                     killService()
                 }
@@ -107,17 +108,26 @@ class TrackingService : Service() {
         startTimer()
         isTracking.value = true
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
 
-        startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                baseNotificationBuilder.build(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
+        }
 
         timeRunInSeconds.onEach {
-            if(!serviceKilled) {
-                 val notification = curNotificationBuilder
+            if (!serviceKilled) {
+                val notification = curNotificationBuilder
                     .setContentText(getFormattedStopWatchTime(it * 1000L))
                 notificationManager.notify(NOTIFICATION_ID, notification.build())
             }
@@ -127,12 +137,12 @@ class TrackingService : Service() {
     private fun startTimer() {
         addEmptyPolyline()
         isTracking.value = true
-        
+
         serviceScope.launch {
             while (isTracking.value) {
                 val loopStart = System.currentTimeMillis()
                 timeRunInMillis.value += TIMER_UPDATE_INTERVAL
-                
+
                 if (timeRunInMillis.value >= lastSecondTimestamp + 1000L) {
                     timeRunInSeconds.value += 1
                     lastSecondTimestamp += 1000L
@@ -142,13 +152,13 @@ class TrackingService : Service() {
             }
         }
     }
-    
+
     private var lastSecondTimestamp = 0L
 
     private fun pauseService() {
         isTracking.value = false
     }
-    
+
     private fun killService() {
         serviceKilled = true
         isFirstRun = true
@@ -157,20 +167,20 @@ class TrackingService : Service() {
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
-    
+
     private var locationJob: kotlinx.coroutines.Job? = null
 
     @SuppressLint("MissingPermission")
     private fun updateLocationTracking(isTracking: Boolean) {
-        if(isTracking) {
-             // Cancel previous job if exists to avoid duplicates
-             locationJob?.cancel()
-             locationJob = locationClient.getLocationUpdates(LOCATION_UPDATE_INTERVAL)
-                 .catch { e -> e.printStackTrace() }
-                 .onEach { location ->
-                     addPathPoint(location)
-                 }
-                 .launchIn(serviceScope)
+        if (isTracking) {
+            // Cancel previous job if exists to avoid duplicates
+            locationJob?.cancel()
+            locationJob = locationClient.getLocationUpdates(LOCATION_UPDATE_INTERVAL)
+                .catch { e -> e.printStackTrace() }
+                .onEach { location ->
+                    addPathPoint(location)
+                }
+                .launchIn(serviceScope)
         } else {
             locationJob?.cancel()
         }
@@ -215,7 +225,7 @@ class TrackingService : Service() {
             .setContentText("00:00:00")
             .setContentIntent(getMainActivityPendingIntent())
     }
-    
+
     private lateinit var curNotificationBuilder: NotificationCompat.Builder
 
     private fun updateNotificationTrackingState(isTracking: Boolean) {
@@ -232,14 +242,16 @@ class TrackingService : Service() {
             PendingIntent.getService(this, 2, resumeIntent, PendingIntent.FLAG_IMMUTABLE)
         }
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Remove previous actions before adding new one
         curNotificationBuilder = baseNotificationBuilder // Refresh builder state if needed
+            .setContentTitle(if (isTracking) "Running..." else "Paused")
             .clearActions()
             .addAction(R.drawable.ic_launcher_foreground, notificationActionText, pendingIntent)
-        
-        if(!serviceKilled) {
+
+        if (!serviceKilled) {
             notificationManager.notify(NOTIFICATION_ID, curNotificationBuilder.build())
         }
     }
@@ -252,8 +264,8 @@ class TrackingService : Service() {
         },
         PendingIntent.FLAG_IMMUTABLE
     )
-    
-     // Helper for formatting time
+
+    // Helper for formatting time
     private fun getFormattedStopWatchTime(ms: Long, includeMillis: Boolean = false): String {
         var milliseconds = ms
         val hours = milliseconds / 1000 / 60 / 60
