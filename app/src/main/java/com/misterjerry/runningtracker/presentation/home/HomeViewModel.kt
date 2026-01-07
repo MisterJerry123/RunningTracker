@@ -1,10 +1,7 @@
-package com.misterjerry.runningtracker.presentation.Home
+package com.misterjerry.runningtracker.presentation.home
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misterjerry.runningtracker.domain.model.Run

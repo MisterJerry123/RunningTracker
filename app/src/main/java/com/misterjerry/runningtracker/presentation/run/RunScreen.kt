@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.presentation.Run
+package com.misterjerry.runningtracker.presentation.run
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -32,7 +32,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.misterjerry.runningtracker.R
-import com.misterjerry.runningtracker.presentation.Home.formatTime
+import com.misterjerry.runningtracker.presentation.home.formatTime
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint

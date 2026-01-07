@@ -11,9 +11,9 @@ import com.misterjerry.runningtracker.domain.usecase.GetRunByIdUseCase
 import com.misterjerry.runningtracker.domain.usecase.GetRunsUseCase
 import com.misterjerry.runningtracker.domain.usecase.SaveLastLocationUseCase
 import com.misterjerry.runningtracker.domain.usecase.SaveRunUseCase
-import com.misterjerry.runningtracker.presentation.Home.HomeViewModel
-import com.misterjerry.runningtracker.presentation.Run.RunViewModel
-import com.misterjerry.runningtracker.presentation.RunDetail.RunDetailViewModel
+import com.misterjerry.runningtracker.presentation.home.HomeViewModel
+import com.misterjerry.runningtracker.presentation.run.RunViewModel
+import com.misterjerry.runningtracker.presentation.runDetail.RunDetailViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel

@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.presentation.RunDetail
+package com.misterjerry.runningtracker.presentation.runDetail
 
 import android.graphics.Color
 import android.view.ViewGroup
@@ -24,7 +24,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.misterjerry.runningtracker.BuildConfig
-import com.misterjerry.runningtracker.presentation.Home.formatTime
+import com.misterjerry.runningtracker.presentation.home.formatTime
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint

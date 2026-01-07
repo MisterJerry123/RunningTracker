@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.presentation.Run
+package com.misterjerry.runningtracker.presentation.run
 
 import org.osmdroid.util.GeoPoint
 

@@ -1,4 +1,4 @@
-package com.misterjerry.runningtracker.presentation.Home
+package com.misterjerry.runningtracker.presentation.home
 
 import com.misterjerry.runningtracker.domain.model.Run
 
