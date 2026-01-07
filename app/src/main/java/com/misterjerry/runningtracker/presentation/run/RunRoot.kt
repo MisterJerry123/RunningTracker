@@ -52,7 +52,7 @@ fun RunRoot(
         onStartRunClick = { viewModel.onAction(RunAction.StartRun) },
         onPauseRunClick = { viewModel.onAction(RunAction.PauseRun) },
         onStopRunClick = {
-            viewModel.onAction(RunAction.StopRun(null))
+            viewModel.onAction(RunAction.StopRun)
             
             if (interstitialAd != null) {
                 interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {

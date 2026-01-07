@@ -1,6 +1,5 @@
 package com.misterjerry.runningtracker.presentation.run
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misterjerry.runningtracker.domain.model.Run
@@ -68,11 +67,11 @@ class RunViewModel(
         when(action) {
             RunAction.StartRun -> startRunUseCase()
             RunAction.PauseRun -> pauseRunUseCase()
-            is RunAction.StopRun -> stopRun(action.mapScreenshot)
+            RunAction.StopRun -> stopRun()
         }
     }
 
-    private fun stopRun(mapScreenshot: Bitmap?) {
+    private fun stopRun() {
         val currentState = state.value
         val currentPathPoints = currentState.pathPoints
         val lastPolyline = currentPathPoints.lastOrNull() ?: emptyList()
@@ -95,7 +94,7 @@ class RunViewModel(
         }
 
         val run = Run(
-            img = null, // Can process bitmap here if needed (mapScreenshot)
+            img = null, 
             timestamp = timestamp,
             avgSpeedInKMH = avgSpeed,
             distanceInMeters = totalDistance,
