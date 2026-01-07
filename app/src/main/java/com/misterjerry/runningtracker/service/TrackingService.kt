@@ -10,6 +10,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.location.Location
+import android.os.BatteryManager.EXTRA_LEVEL
+import android.os.BatteryManager.EXTRA_SCALE
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -61,15 +64,15 @@ class TrackingService : Service() {
         val timeRunInMillis = MutableStateFlow(0L)
         val isTracking = MutableStateFlow(false)
         val pathPoints = MutableStateFlow<Polylines>(mutableListOf())
-        private val _cancelRunEvent = kotlinx.coroutines.flow.MutableSharedFlow<String>(replay = 1)
+        private val _cancelRunEvent = MutableSharedFlow<String>(replay = 1)
         val cancelRunEvent = _cancelRunEvent.asSharedFlow()
     }
 
-    private fun batteryFlow() = kotlinx.coroutines.flow.callbackFlow {
+    private fun batteryFlow() = callbackFlow {
         val checkBattery = { intent: Intent ->
             if (BuildConfig.FLAVOR == "dev") {
-                val level = intent.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1)
-                val scale = intent.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1)
+                val level = intent.getIntExtra(EXTRA_LEVEL, -1)
+                val scale = intent.getIntExtra(EXTRA_SCALE, -1)
                 val batteryPct = level * 100 / scale.toFloat()
                 
                 Log.d("TrackingService", "Battery level checked: $batteryPct%")
