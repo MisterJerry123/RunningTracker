@@ -11,9 +11,11 @@ import com.misterjerry.runningtracker.domain.usecase.DeleteRunUseCase
 import com.misterjerry.runningtracker.domain.usecase.GetLastLocationUseCase
 import com.misterjerry.runningtracker.domain.usecase.GetRunByIdUseCase
 import com.misterjerry.runningtracker.domain.usecase.GetRunsUseCase
+import com.misterjerry.runningtracker.domain.usecase.PauseRunUseCase
 import com.misterjerry.runningtracker.domain.usecase.SaveLastLocationUseCase
 import com.misterjerry.runningtracker.domain.usecase.SaveRunUseCase
 import com.misterjerry.runningtracker.domain.usecase.StartRunUseCase
+import com.misterjerry.runningtracker.domain.usecase.StopRunUseCase
 import com.misterjerry.runningtracker.presentation.home.HomeViewModel
 import com.misterjerry.runningtracker.presentation.run.RunViewModel
 import com.misterjerry.runningtracker.presentation.runDetail.RunDetailViewModel
@@ -42,6 +44,8 @@ val appModule = module {
     factory { GetLastLocationUseCase(get()) }
     factory { SaveLastLocationUseCase(get()) }
     factory { StartRunUseCase(get()) }
+    factory { PauseRunUseCase(get()) }
+    factory { StopRunUseCase(get()) }
 
 //    viewModel {
 //        HomeViewModel(
@@ -60,7 +64,9 @@ val appModule = module {
 
     viewModel {
         RunViewModel(
-            androidContext(),
+            get(),
+            get(),
+            get(),
             get(),
             get(),
             get()

@@ -46,7 +46,7 @@ fun RunScreen(
     state: RunState,
     onStartRunClick: () -> Unit,
     onPauseRunClick: () -> Unit,
-    onStopRunClick: (Context) -> Unit
+    onStopRunClick: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -184,7 +184,7 @@ fun RunScreen(
                 Spacer(modifier = Modifier.padding(8.dp))
                 Button(
                     onClick = {
-                        onStopRunClick(context)
+                        onStopRunClick()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {

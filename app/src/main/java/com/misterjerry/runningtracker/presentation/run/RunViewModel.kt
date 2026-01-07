@@ -1,16 +1,16 @@
 package com.misterjerry.runningtracker.presentation.run
 
-import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.misterjerry.runningtracker.domain.model.Run
 import com.misterjerry.runningtracker.domain.usecase.GetLastLocationUseCase
+import com.misterjerry.runningtracker.domain.usecase.PauseRunUseCase
 import com.misterjerry.runningtracker.domain.usecase.SaveLastLocationUseCase
 import com.misterjerry.runningtracker.domain.usecase.SaveRunUseCase
+import com.misterjerry.runningtracker.domain.usecase.StartRunUseCase
+import com.misterjerry.runningtracker.domain.usecase.StopRunUseCase
 import com.misterjerry.runningtracker.service.TrackingService
-import com.misterjerry.runningtracker.util.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -20,7 +20,9 @@ import org.osmdroid.util.GeoPoint
 import java.util.Calendar
 
 class RunViewModel(
-    private val context: Context,
+    private val startRunUseCase: StartRunUseCase,
+    private val pauseRunUseCase: PauseRunUseCase,
+    private val stopRunUseCase: StopRunUseCase,
     private val saveRunUseCase: SaveRunUseCase,
     private val getLastLocationUseCase: GetLastLocationUseCase,
     private val saveLastLocationUseCase: SaveLastLocationUseCase
@@ -63,14 +65,14 @@ class RunViewModel(
     }
 
     fun startRun() {
-        sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
+        startRunUseCase()
     }
 
     fun pauseRun() {
-        sendCommandToService(Constants.ACTION_PAUSE_SERVICE)
+        pauseRunUseCase()
     }
 
-    fun stopRun(context: Context, mapScreenshot: Bitmap?) {
+    fun stopRun(mapScreenshot: Bitmap?) {
         val currentState = state.value
         val currentPathPoints = currentState.pathPoints
         val lastPolyline = currentPathPoints.lastOrNull() ?: emptyList()
@@ -108,14 +110,7 @@ class RunViewModel(
         }
 
         // Stop service after capturing data
-        sendCommandToService(Constants.ACTION_STOP_SERVICE)
-    }
-
-    private fun sendCommandToService(action: String) {
-        Intent(context, TrackingService::class.java).also {
-            it.action = action
-            context.startService(it)
-        }
+        stopRunUseCase()
     }
 
     private fun calculatePolylineLength(polyline: List<GeoPoint>): Float {
